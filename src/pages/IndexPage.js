@@ -18,11 +18,13 @@ import {
   ClearBlock,
   GridContainer,
   PageContainer,
+  SpacedGridContainer,
 } from 'components/styles/global';
 
 // Scripts
 import script from 'python/script.py';
 import useDidMountEffect from 'components/useDidMountEffect';
+import { AppContext } from 'contexts/AppContext';
 
 // #region NOTES
 /* 
@@ -38,7 +40,25 @@ import useDidMountEffect from 'components/useDidMountEffect';
 */
 // #endregion END NOTES
 
-const IndexPage = () => {
+const Loader = styled(
+  ({ loaded, children, loader = 'Loading...', ...props }) => {
+    const [show, setShow] = useState(false);
+    useDidMountEffect(() => {
+      setShow(true);
+    }, [loaded]);
+
+    return <>{show ? children : loader}</>;
+  }
+)``;
+
+const IndexPage = styled(({ ...props }) => {
+  const appCtx = useContext(AppContext);
+  useEffect(() => {
+    appCtx.setMainLayoutOptions({
+      pageTitle: 'EEG Data Generator',
+    });
+  }, [appCtx.setMainLayoutOptions]);
+
   const [pythonFile, setPythonFile] = useState(null);
   const [loadedNumpy, setLoadedNumpy] = useState(false);
   const [data, setData] = useState([]);
@@ -81,7 +101,7 @@ const IndexPage = () => {
       window.pyodide.registerJsModule('sliders_namespace', slidersNamespace);
       const output = window.pyodide.runPython(pythonFile);
       const generate_data = window.pyodide.globals.get('generate_data');
-      setData(generate_data().toJs());
+      setData(generate_data(slidersNamespace).toJs());
 
       return () => {
         output.destroy();
@@ -144,73 +164,77 @@ const IndexPage = () => {
   };
 
   return (
-    <PageContainer alignContent="flex-start">
-      <Grid item xs={12}>
-        <Grid container justifyContent="center">
-          <Grid item xs={12} sm={8} md={6}>
-            <Chart
-              options={chartData.options}
-              series={chartData.series}
-              type="line"
-              width="100%"
-            />
-          </Grid>
-          <Grid item xs={8}>
-            <GridContainer>
-              <Button onClick={() => visualizeData()} variant="contained">
-                Load data
-              </Button>
-            </GridContainer>
-          </Grid>
-          <ClearBlock pb={10} />
-          <Grid item xs={8}>
-            <Grid container justifyContent="center">
-              <Grid item xs={6}>
-                <GridContainer>
-                  <Grid item xs={12}>
-                    <Typography variant="h6" color="initial" align="center">
-                      Theta amplitude
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Slider
-                      //   defaultValue={0.2}
-                      value={slidersNamespace.tAmp}
-                      step={0.1}
-                      min={sliderConfigs.minAmp}
-                      max={sliderConfigs.maxAmp}
-                      valueLabelDisplay="auto"
-                      onChange={(e, v) => sliderCB(v, 'theta')}
-                    />
-                  </Grid>
-                </GridContainer>
-              </Grid>
-              <Grid item xs={6}>
-                <GridContainer>
-                  <Grid item xs={12}>
-                    <Typography variant="h6" color="initial" align="center">
-                      Beta amplitude
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Slider
-                      //   defaultValue={0.2}
-                      value={slidersNamespace.bAmp}
-                      step={0.1}
-                      min={sliderConfigs.minAmp}
-                      max={sliderConfigs.maxAmp}
-                      valueLabelDisplay="auto"
-                      onChange={(e, v) => sliderCB(v, 'beta')}
-                    />
-                  </Grid>
-                </GridContainer>
-              </Grid>
+    <Loader loaded={pythonFile && loadedNumpy}>
+      <PageContainer alignContent="flex-start" {...props}>
+        <Grid item xs={12}>
+          <Grid container justifyContent="center">
+            <Grid item xs={12} sm={8} md={6}>
+              <Chart
+                options={chartData.options}
+                series={chartData.series}
+                type="line"
+                width="100%"
+              />
+            </Grid>
+            <Grid item xs={8}>
+              <GridContainer>
+                <Button onClick={() => visualizeData()} variant="contained">
+                  Load data
+                </Button>
+              </GridContainer>
+            </Grid>
+            <ClearBlock pb={10} />
+            <Grid item xs={8}>
+              <SpacedGridContainer spacing={4} justifyContent="center">
+                <Grid item xs={6}>
+                  <GridContainer>
+                    <Grid item xs={12}>
+                      <Typography variant="h6" color="initial" align="center">
+                        Theta amplitude
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Slider
+                        //   defaultValue={0.2}
+                        value={slidersNamespace.tAmp}
+                        step={0.1}
+                        min={sliderConfigs.minAmp}
+                        max={sliderConfigs.maxAmp}
+                        valueLabelDisplay="auto"
+                        onChange={(e, v) => sliderCB(v, 'theta')}
+                      />
+                    </Grid>
+                  </GridContainer>
+                </Grid>
+                <Grid item xs={6}>
+                  <GridContainer>
+                    <Grid item xs={12}>
+                      <Typography variant="h6" color="initial" align="center">
+                        Beta amplitude
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Slider
+                        //   defaultValue={0.2}
+                        value={slidersNamespace.bAmp}
+                        step={0.1}
+                        min={sliderConfigs.minAmp}
+                        max={sliderConfigs.maxAmp}
+                        valueLabelDisplay="auto"
+                        onChange={(e, v) => sliderCB(v, 'beta')}
+                      />
+                    </Grid>
+                  </GridContainer>
+                </Grid>
+              </SpacedGridContainer>
             </Grid>
           </Grid>
         </Grid>
-      </Grid>
-    </PageContainer>
+      </PageContainer>
+    </Loader>
   );
-};
+})`
+  margin: 0 auto;
+`;
 
 export default IndexPage;
