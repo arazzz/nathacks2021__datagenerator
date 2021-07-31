@@ -1,6 +1,6 @@
-# import numpy as np
+import my_js_namespace
+# print(my_js_namespace.x) # 3
+my_js_namespace.y = 7
 
-def func():
-    return 2 + 2
-
-func()
+def testFunc():
+    print("Hello")
