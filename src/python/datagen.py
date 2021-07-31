@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import sliders_namespace as sn
 
 #to import (for each frequency)
 #   length of epoch
@@ -8,7 +9,6 @@ import matplotlib.pyplot as plt
 #   amp
 #   noise
 
-srate = 250
 # returns
 epoch = []
 spectrum = []
@@ -28,23 +28,23 @@ def generateNoisyWave(times, freq, amp, noise):
 
 def generate_data():
 
-    times = np.linspace(0,1,srate) # One second at 250Hz
-    theta = generateNoisyWave(times, 6, 10, 1) # (time, Freq, Amp, Noise)
-    beta = generateNoisyWave(times, 16, 5, 1)
+    times = np.linspace(0,sn.epochDuration,sn.samplingRate) # One second at 250Hz
+    theta = generateNoisyWave(times, sn.tFreq, sn.tAmp, sn.tNoise) # (time, Freq, Amp, Noise)
+    beta = generateNoisyWave(times, sn.bFreq, sn.bAmp, sn.bNoise)
 
     xy_list = []
 
     for x in range(0, len(times)):
         xy_list.append([times[x], theta[x] + beta[x]])
 
-    return xy_list
+    return beta + theta
 
     # plt.plot(times, y)
     # plt.show()
 
 def fft(series):
     fftData = np.fft.rfft(series)
-    freq = np.fft.fftfreq(len(series))*srate
+    freq = np.fft.fftfreq(len(series))*sn.samplingRate
 
     freq = freq[0:50]
     fftData = fftData[0:50]
@@ -55,18 +55,19 @@ def fft(series):
     plt.show()
 
 def freqSpec(data):
-    n = data.size
+    n = len(data)
     Y = np.fft.fft(data)/n # fft computing and normalization
     Y = Y[1:int(n/2)]
     k = np.arange(n)
-    T = n*(1/srate)
+    T = n*(1/sn.samplingRate)
     frq = k/T # two sides frequency range
     frq = frq[1:int(n/2)] # one side frequency range
-    pw = np.abs(Y)**2
+    pw = np.abs(Y)
     return frq, pw
 
 def plotFS(data):
     frq, pw = freqSpec(data)
     plt.plot(frq, pw)
+    plt.show()
 
-fft(generate_data())
+plotFS(generate_data())
