@@ -14,7 +14,7 @@ def generateNoisyWave(times, freq, amp, noise):
         noiseArray = noise * np.random.randn(1)
     
     
-    sineWave = amp * np.sin(freq * 2 * np.pi * times)
+    sineWave = amp * np.sin(freq * 2 * np.pi * (times + np.random.randn(1)))
     return sineWave + noiseArray
 
 def generate_data():

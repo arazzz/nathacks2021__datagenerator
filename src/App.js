@@ -68,7 +68,7 @@ const App = () => {
           options={chartData.options}
           series={chartData.series}
           type="line"
-          width="500"
+          width="800"
         />
         <button onClick={() => visualizeData()}>Load data</button>
       </header>
