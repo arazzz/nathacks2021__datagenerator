@@ -32,7 +32,12 @@ def generate_data():
     theta = generateNoisyWave(times, 6, 10, 1) # (time, Freq, Amp, Noise)
     beta = generateNoisyWave(times, 16, 5, 1)
 
-    return theta + beta
+    xy_list = []
+
+    for x in range(0, len(times)):
+        xy_list.append([times[x], theta[x] + beta[x]])
+
+    return xy_list
 
     # plt.plot(times, y)
     # plt.show()
