@@ -54,4 +54,24 @@ def fft(series):
     plt.ylabel("Magnitude")
     plt.show()
 
+def freqSpec(data):
+    # fft = (np.abs(np.fft.rfft(data, n=data.size)/data.size))**2
+    # frq = np.fft.rfftfreq(fft.size) * 1/dt
+    # return (frq, fft)
+    n = data.shape[0]
+    Y = np.fft.rfft(data, n=n)/n  # fft computing and normalization
+    Y = Y[1:int(n/2)]
+    k = np.arange(n)
+    T = n*(1/srate)
+    frq = k/T  # two sides frequency range
+    frq = frq[1:int(n/2)]  # one side frequency range
+    _frq = np.fft.rfftfreq(data.shape[0], d=(1/srate))
+    Y_frq = np.abs(Y)**2
+    # return (_frq[0:200], Y_frq[0:200])
+    return (_frq, Y_frq)
+
+def plotFS(data):
+    _frqs, Y_frq = freqSpec(data)
+    plt.plot(_frqs, Y_frq)
+
 fft(generate_data())
