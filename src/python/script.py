@@ -1,5 +1,6 @@
 import numpy as np
-import sliders_namespace as sn
+import js
+# import sliders_namespace as sn
 
 #to import (for each frequency)
 #   length of epoch
@@ -13,6 +14,8 @@ epoch = []
 spectrum = []
 bins = []
 
+results = {}
+
 def generateNoisyWave(times, freq, amp, noise):
     
     # This simplifies code later, this basically just creates our noise for us
@@ -25,7 +28,9 @@ def generateNoisyWave(times, freq, amp, noise):
     sineWave = amp * np.sin(freq * 2 * np.pi * times)
     return sineWave + noiseArray
 
-def generate_data(args = {}):
+def generate_data():
+
+    args = js.window.pyArgs
 
     times = np.linspace(0,args.epochDuration,args.samplingRate) # One second at 250Hz
     theta = generateNoisyWave(times, args.tFreq, args.tAmp, args.tNoise) # (time, Freq, Amp, Noise)
@@ -38,3 +43,10 @@ def generate_data(args = {}):
 
     # return beta + theta
     return xy_list
+
+def return_results():
+    global results
+    results['generate_data_output'] = generate_data()
+
+    return results
+    
