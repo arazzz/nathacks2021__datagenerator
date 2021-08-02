@@ -98,14 +98,21 @@ const IndexPage = styled(({ ...props }) => {
   const visualizeData = useCallback(() => {
     // Once python script and numpy have been loaded
     if (pythonFile && loadedNumpy) {
-      window.pyodide.registerJsModule('sliders_namespace', slidersNamespace);
-      const output = window.pyodide.runPython(pythonFile);
-      const generate_data = window.pyodide.globals.get('generate_data');
-      setData(generate_data(slidersNamespace).toJs());
+      window.pyArgs = { ...slidersNamespace };
+      const runPyScript = window.pyodide.runPython(pythonFile);
+      const returnResults = window.pyodide.runPython(`return_results()`);
+
+      // setData();
+
+      setData(returnResults?.generate_data_output);
+
+      // setData(output.toJs())
 
       return () => {
-        output.destroy();
-        generate_data.destroy();
+        runPyScript.destroy();
+        returnResults.destory();
+        // output.destroy();
+        // generate_data.destroy();
       };
     }
   }, [pythonFile, loadedNumpy]);
@@ -119,17 +126,26 @@ const IndexPage = styled(({ ...props }) => {
       !sliderUpdateComplete
     ) {
       //   console.log(slidersNamespace.bAmp, slidersNamespace.tAmp);
-      window.pyodide.registerJsModule('sliders_namespace', slidersNamespace);
-      const output = window.pyodide.runPython(pythonFile);
-      const generate_data = window.pyodide.globals.get('generate_data');
-      setData(generate_data(slidersNamespace).toJs());
+      // window.pyodide.registerJsModule('sliders_namespace', slidersNamespace);
+      if (pythonFile && loadedNumpy) {
+        window.pyArgs = { ...slidersNamespace };
+        const runPyScript = window.pyodide.runPython(pythonFile);
+        const returnResults = window.pyodide.runPython(`return_results()`);
 
-      setSliderUpdateComplete(true);
+        // setData();
 
-      return () => {
-        output.destroy();
-        generate_data.destroy();
-      };
+        setData(returnResults?.generate_data_output);
+        setSliderUpdateComplete(true);
+
+        // setData(output.toJs())
+
+        return () => {
+          runPyScript.destroy();
+          returnResults.destory();
+          // output.destroy();
+          // generate_data.destroy();
+        };
+      }
     }
   }, [pythonFile, loadedNumpy, data, slidersNamespace, sliderUpdateComplete]);
 
