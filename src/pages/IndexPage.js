@@ -135,6 +135,7 @@ const IndexPage = styled(({ ...props }) => {
         // setData();
 
         setData(returnResults?.generate_data_output);
+        setSliderUpdateComplete(true);
 
         // setData(output.toJs())
 
