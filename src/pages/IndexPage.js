@@ -49,17 +49,20 @@ const updateVisualizer = ({
   if (pythonFile && loadedNumpy) {
     window.pyArgs = { ...slidersNamespace };
     const runPyScript = window.pyodide.runPython(pythonFile);
-    const returnResults = window.pyodide.runPython(`return_results()`);
+    const gen_data = window.pyodide.runPython(`generate_data()`);
+    const get_data = window.pyodide.runPython(`get_data()`)
+    console.log(get_data)
 
     // setData();
 
-    setData(returnResults?.generate_data_output);
+    setData(get_data);
 
     // setData(output.toJs())
 
     return () => {
       runPyScript.destroy();
-      returnResults.destory();
+      gen_data.destory();
+      get_data.destroy();
       // output.destroy();
       // generate_data.destroy();
     };

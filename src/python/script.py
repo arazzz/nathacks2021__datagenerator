@@ -14,7 +14,7 @@ most recently created epoch
 '''
 
 import numpy as np
-import sliders_namespace as sn
+import js
 
 # Global data variable to hold the most recent epoch
 curr_data = []      # raw data
@@ -34,9 +34,11 @@ curr_powerspec = [] # power spectrum
 #   args.bFreq:     frequency of beta wave
 #   args.bAmp:      amplitude of beta wave
 #   args.bNoise:    amount of noise in beta wave
-def generate_data(args = {}):
+def generate_data():
 
     global curr_data, curr_data_sr, curr_data_ed
+
+    args = js.window.pyArgs
 
     times = np.linspace(0,args.epochDuration,args.samplingRate) # One second at 250Hz
     theta = generateNoisyWave(times, args.tFreq, args.tAmp, args.tNoise) # (time, Freq, Amp, Noise)
@@ -52,7 +54,7 @@ def generate_data(args = {}):
     curr_data_ed = args.epochDuration
 
 # Creates an fft and power spectra from the most recently generated epoch and stores them in global variables
-def generate_spectra()
+def generate_spectra():
 
     global curr_data, curr_fft, curr_powerspec, curr_data_sr, curr_data_ed
 
@@ -61,21 +63,24 @@ def generate_spectra()
 
 # Returns most recent raw data to JS
 # returns list of [time, voltage] pairs
-def get_data()
+def get_data():
 
     global curr_data
+
+    print(curr_data)
+
     return curr_data
 
 # fft function for returning result to Javascript
 # returns list of [frequency, amplitude] pairs corresponding to fourier spectrum
-def get_fft(args = {}):
+def get_fft():
 
     global curr_fft
     return curr_fft
 
 # Power spectrum function for returning result to Javascript
 # returns list of [frequency, amplitude] pairs corresponding to fourier spectrum
-def get_power_spec(args = {}):
+def get_power_spec():
 
     global curr_powerspec
     return curr_powerspec
